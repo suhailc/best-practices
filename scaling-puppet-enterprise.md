@@ -6,7 +6,7 @@ This standard defines how to determine bottlenecks in PE and think about adding 
 
 ## Expectations
 
-This standard relies on the [Monitoring PE standard]() and assumes the user will have metrics that can be trended over time.  
+This best practice relies on the [Puppet Enterprise metrics collection best practice](https://github.com/puppetlabs/best-practices/blob/master/puppet-enterprise-metrics-collection.md) and assumes the user will have metrics that can be trended over time.  
 
 There is also an expectation that the user will have already performed tuning to have the correct amount of heap, number of JRubies, command processing threads, etc… Tuning should be completed before scaling with additional hardware.  For simplicity tuning and scaling are treated as separate topics, we assume you already tuned appropriately then metrics can indicate the need for more hardware resources.
 
@@ -41,6 +41,7 @@ If you’d like to add 2.5K nodes to your installation you will need 2.5k / 416 
 #### Determining the need to add resources to your MoM 
 
 In the above compile master section we naively assume that you can infinitely horizontally scale compile masters but there are central bottlenecks.  The MoM has the Console, PuppetDB and PostgreSQL located on it and along the way you will need to add CPU and RAM to this machine.  The easiest thing to track is the load avg / CPU use on the MoM and as CPU use gets closer to 100% or load avg approaches the number of available cores then you will want to add resources to keep up with demand.  
+
 There are various metrics in PuppetDB that will show a slowdown as resource capacity is reached on the MoM.  Commands / sec, replace facts, replace catalog, and store report will all slow down as resource capacity is reached on the MoM.  If you see a trend of these getting longer and longer over time then two things should be considered.  VACUUM FULL or pg_repack of the tables in the pe-puppetdb database which optimizes performance of queries on those tables.  If that does not yield significant enough improvements in storage time then it will be time to increase the available CPU and RAM to the MoM.
 
 #### Determining a need for additional PuppetDB service nodes
